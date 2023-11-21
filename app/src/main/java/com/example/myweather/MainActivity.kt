@@ -1,6 +1,7 @@
     package com.example.myweather
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,18 +17,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myweather.ui.WeatherViewModel
 import com.example.myweather.ui.WeatherViewModelFactory
+import com.example.myweather.ui.screen.WeatherScreen
 import com.example.myweather.ui.theme.MyWeatherTheme
-
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyWeatherTheme {
-
+                WeatherApp()
             }
         }
     }
@@ -35,41 +39,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WeatherApp(){
-    val viewModel : WeatherViewModel = viewModel(factory = WeatherViewModelFactory.getInstance())
-    val context = LocalContext.current
-
-    val locationPermissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+    //val viewModel : WeatherViewModel = viewModel(factory = WeatherViewModelFactory.getInstance())
+    WeatherScreen(
+        modifier = Modifier
+            .fillMaxSize()
     )
-
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = {permissions ->
-            val permissionsGranted = permissions.values.reduce { acc, isPermissionGranted ->
-                acc && isPermissionGranted
-            }
-
-            if(!permissionsGranted){
-
-            }
-        }
-    )
-
-    if(locationPermissionGranted(context)){
-        // Launch weather api request here
-    }else{
-        locationPermissionLauncher.launch(locationPermissions)
-    }
 
 }
 
-private fun locationPermissionGranted(context : Context) = ContextCompat.checkSelfPermission(
-    context,
-    Manifest.permission.ACCESS_FINE_LOCATION
-) == PackageManager.PERMISSION_GRANTED
 
-        @Preview(showBackground = true)
+
+@Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     MyWeatherTheme {

@@ -1,6 +1,6 @@
-package com.example.myweather.ui.model.remote.model
+package com.example.myweather.model.remote.model
 
-import com.example.myweather.ui.model.remote.config.ApiService
+import com.example.myweather.model.remote.config.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

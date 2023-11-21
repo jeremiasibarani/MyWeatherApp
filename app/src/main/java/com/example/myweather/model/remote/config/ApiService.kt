@@ -1,6 +1,6 @@
-package com.example.myweather.ui.model.remote.config
+package com.example.myweather.model.remote.config
 
-import com.example.myweather.ui.model.remote.model.CurrentLocationWeatherResponse
+import com.example.myweather.model.remote.model.CurrentLocationWeatherResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.QueryMap

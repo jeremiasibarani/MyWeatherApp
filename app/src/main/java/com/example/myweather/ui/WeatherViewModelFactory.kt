@@ -2,9 +2,9 @@ package com.example.myweather.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.myweather.ui.model.remote.config.ApiService
-import com.example.myweather.ui.model.remote.config.RetrofitConfig
-import com.example.myweather.ui.model.remote.model.WeatherRepository
+import com.example.myweather.model.remote.config.ApiService
+import com.example.myweather.model.remote.config.RetrofitConfig
+import com.example.myweather.model.remote.model.WeatherRepository
 
 @Suppress("UNCHECKED_CAST")
 class WeatherViewModelFactory private constructor(private val repository: WeatherRepository) : ViewModelProvider.NewInstanceFactory(){

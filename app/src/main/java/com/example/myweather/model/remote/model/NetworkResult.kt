@@ -1,4 +1,4 @@
-package com.example.myweather.ui.model.remote.model
+package com.example.myweather.model.remote.model
 
 sealed class NetworkResult<out R> private constructor(){
     data class Success<out T>(val data : T) : NetworkResult<T>()

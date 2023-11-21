@@ -1,4 +1,4 @@
-package com.example.myweather.ui.model.remote.config
+package com.example.myweather.model.remote.config
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -16,8 +16,8 @@ object RetrofitConfig {
         .client(client)
         .build()
 
-    private var INSTANCE :ApiService? = null
-    fun getInstance() : ApiService{
+    private var INSTANCE : ApiService? = null
+    fun getInstance() : ApiService {
         if(INSTANCE == null){
             INSTANCE = retrofit.create(ApiService::class.java)
         }
