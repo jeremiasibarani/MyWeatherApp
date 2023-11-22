@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">MyWeather</string>
-    <string name="city_and_degree">%$1s, %$2s C</string>
+    <string name="city_and_degree">%1$s, %2$.1f °C</string>
 </resources>

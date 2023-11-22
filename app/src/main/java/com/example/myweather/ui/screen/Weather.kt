@@ -9,6 +9,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RawRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -19,20 +25,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.myweather.R
+import com.example.myweather.model.remote.model.CurrentLocationWeatherResponse
+import com.example.myweather.model.remote.model.NetworkResult
 import com.example.myweather.ui.WeatherViewModel
+import com.example.myweather.ui.WeatherViewModelFactory
+import com.example.myweather.ui.theme.MyWeatherTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import java.util.concurrent.TimeUnit
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myweather.model.remote.model.NetworkResult
-import com.example.myweather.ui.WeatherViewModelFactory
 
 private lateinit var locationCallback : LocationCallback
 private lateinit var locationProvider : FusedLocationProviderClient
@@ -52,9 +70,11 @@ fun WeatherScreen(
 
     val currentLocation by viewModel.currentLocationWeather.collectAsState()
 
-    // Todo(the api call should be run inside a side-effect)
-    LaunchedEffect(key1 = Unit){
-        viewModel.getCurrentLocationWeather(userLocation.lat, userLocation.lon)
+    Log.i("LOCATION-TAG", "$userLocation")
+    LaunchedEffect(key1 = userLocation){
+        if(userLocation.lat != 0.0 && userLocation.lon != 0.0){
+            viewModel.getCurrentLocationWeather(userLocation.lat, userLocation.lon)
+        }
     }
 
     when(val state = currentLocation){
@@ -62,10 +82,9 @@ fun WeatherScreen(
 
         }
         is NetworkResult.Success -> {
-            Text(
+            WeatherSuccess(
                 modifier = modifier,
-                textAlign = TextAlign.Center,
-                text = "${state.data}"
+                data = state.data
             )
         }
         is NetworkResult.Error -> {
@@ -77,6 +96,84 @@ fun WeatherScreen(
     }
 
 
+}
+
+//Todo( - get more animation for each weather condition code : see (https://openweathermap.org/weather-conditions) for reference
+// - create a button to trigger the weather location request
+// - display progressbar as response to loading state
+// - toast or perhaps snackbar as response to error or exception state
+// - implement dependency injection
+// - make a short video out of it and post it on linkedin
+
+@Composable
+private fun WeatherSuccess(
+    modifier: Modifier = Modifier,
+    data : CurrentLocationWeatherResponse
+){
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        WeatherAnimation(
+            modifier = Modifier
+                .size(400.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 20.dp, horizontal = 10.dp),
+            rawResourceId = getWeatherAnimation(data.weather[0].main)
+        )
+        Text(
+            text = stringResource(id = R.string.city_and_degree, data.name, data.main.temp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 5.dp),
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "${data.weather[0].main}, ${data.weather[0].description}",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 5.dp),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun WeatherErrorException(
+    modifier : Modifier = Modifier
+){
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+    }
+}
+
+@Composable
+private fun WeatherAnimation(
+    modifier: Modifier = Modifier,
+    @RawRes rawResourceId : Int
+){
+    val preloaderLottieComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(
+            rawResourceId
+        )
+    )
+
+    val preloaderProgress by animateLottieCompositionAsState(
+        composition = preloaderLottieComposition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
+
+    LottieAnimation(
+        composition = preloaderLottieComposition,
+        progress = preloaderProgress,
+        modifier = modifier
+    )
 }
 
 @SuppressLint("MissingPermission")
@@ -177,3 +274,27 @@ private fun locationPermissionGranted(context : Context) = ContextCompat.checkSe
     context,
     Manifest.permission.ACCESS_FINE_LOCATION
 ) == PackageManager.PERMISSION_GRANTED
+
+private fun getWeatherAnimation(weather : String) : Int{
+    return when(weather){
+        "Thunderstorm" -> R.raw.daylight_thunderstorm
+        "Drizzle" -> R.raw.daylight_atmosphere
+        "Rain" -> R.raw.daylight_rain
+        "Snow" -> R.raw.daylight_snow
+        "Atmosphere" -> R.raw.daylight_atmosphere
+        "Clear" -> R.raw.daylight_clear
+        "Clouds" -> R.raw.daylight_cloud
+        else -> R.raw.daylight_clear
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WeatherScreenPreview(){
+    MyWeatherTheme {
+//        WeatherSuccess(
+//            modifier = Modifier
+//                .fillMaxSize()
+//        )
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.myweather.model.remote.model
 
+import com.example.myweather.BuildConfig
 import com.example.myweather.model.remote.config.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,7 +15,7 @@ class WeatherRepository(
             val queries = mutableMapOf<String, Any>()
             queries["lat"] = lat
             queries["lon"] = lon
-            queries["appid"] = ""
+            queries["appid"] = BuildConfig.API_KEY
             queries["units"] = "metric"
 
             val response = apiService.getCurrentLocationWeather(queries)
