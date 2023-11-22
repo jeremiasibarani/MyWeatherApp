@@ -77,21 +77,27 @@ fun WeatherScreen(
         }
     }
 
-    when(val state = currentLocation){
-        is NetworkResult.Loading -> {
-
-        }
-        is NetworkResult.Success -> {
-            WeatherSuccess(
-                modifier = modifier,
-                data = state.data
-            )
-        }
-        is NetworkResult.Error -> {
-
-        }
-        is NetworkResult.Exception -> {
-
+    Column(
+        modifier = modifier
+            .padding(vertical = 20.dp, horizontal = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        when(val state = currentLocation){
+            is NetworkResult.Loading -> {
+                WeatherLoading()
+            }
+            is NetworkResult.Success -> {
+                WeatherSuccess(
+                    data = state.data
+                )
+            }
+            is NetworkResult.Error -> {
+                WeatherErrorException()
+            }
+            is NetworkResult.Exception -> {
+                WeatherErrorException()
+            }
         }
     }
 
@@ -110,51 +116,54 @@ private fun WeatherSuccess(
     modifier: Modifier = Modifier,
     data : CurrentLocationWeatherResponse
 ){
-    Column(
+    WeatherAnimation(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        WeatherAnimation(
-            modifier = Modifier
-                .size(400.dp)
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = 20.dp, horizontal = 10.dp),
-            rawResourceId = getWeatherAnimation(data.weather[0].main)
-        )
-        Text(
-            text = stringResource(id = R.string.city_and_degree, data.name, data.main.temp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 5.dp),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "${data.weather[0].main}, ${data.weather[0].description}",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 5.dp),
-            textAlign = TextAlign.Center
-        )
-    }
+        rawResourceId = getWeatherAnimation(data.weather[0].main)
+    )
+    Text(
+        text = stringResource(id = R.string.city_and_degree, data.name, data.main.temp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp),
+        textAlign = TextAlign.Center
+    )
+    Text(
+        text = "${data.weather[0].main}, ${data.weather[0].description}",
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp),
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun WeatherLoading(
+    modifier : Modifier = Modifier
+){
+    WeatherAnimation(
+        modifier = modifier
+            .size(250.dp),
+        rawResourceId = R.raw.loading
+    )
 }
 
 @Composable
 private fun WeatherErrorException(
-    modifier : Modifier = Modifier
+    modifier : Modifier = Modifier,
+    message : String = "Something went wrong"
 ){
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-    }
+    Text(
+        text = message,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .fillMaxWidth()
+    )
 }
 
 @Composable
 private fun WeatherAnimation(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
+        .size(400.dp),
     @RawRes rawResourceId : Int
 ){
     val preloaderLottieComposition by rememberLottieComposition(
