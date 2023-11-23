@@ -120,13 +120,6 @@ fun WeatherScreen(
 
 }
 
-//Todo( - get more animation for each weather condition code : see (https://openweathermap.org/weather-conditions) for reference
-// - create a button to trigger the weather location request
-// - display progressbar as response to loading state
-// - toast or perhaps snackbar as response to error or exception state
-// - implement dependency injection
-// - make a short video out of it and post it on linkedin
-
 @Composable
 private fun WeatherSuccess(
     modifier: Modifier = Modifier,
@@ -323,13 +316,5 @@ private fun getWeatherAnimation(weather : String) : Int{
         "Clear" -> R.raw.daylight_clear
         "Clouds" -> R.raw.daylight_cloud
         else -> R.raw.daylight_clear
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun WeatherScreenPreview(){
-    MyWeatherTheme {
-
     }
 }

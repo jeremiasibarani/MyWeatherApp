@@ -30,11 +30,3 @@ fun WeatherApp(){
             .fillMaxSize()
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyWeatherTheme {
-        WeatherApp()
-    }
-}

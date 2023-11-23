@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,6 +9,10 @@ plugins {
 }
 
 android {
+    val localPropertiesFile = rootProject.file("local.properties")
+    val localProperties = Properties()
+    localProperties.load(FileInputStream(localPropertiesFile))
+
     namespace = "com.example.myweather"
     compileSdk = 34
 
@@ -20,8 +27,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "API_KEY", "\"05bc0dd5d5a89c6a14fa978333cfddf4\"")
-        buildConfigField("String", "BASE_API", "\"https://api.openweathermap.org/data/2.5/\"")
+        buildConfigField("String", "API_KEY", localProperties["apiKey"] as String)
+        buildConfigField("String", "BASE_API", localProperties["baseUrl"] as String)
     }
 
     buildTypes {
