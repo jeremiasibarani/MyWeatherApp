@@ -12,9 +12,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,10 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.compose.LottieAnimation
@@ -66,15 +74,9 @@ fun WeatherScreen(
     viewModel : WeatherViewModel = viewModel(factory = WeatherViewModelFactory.getInstance())
 ){
     val context = LocalContext.current
-    val userLocation = getUserLocation(context)
 
-    val currentLocation by viewModel.currentLocationWeather.collectAsState()
-
-    Log.i("LOCATION-TAG", "$userLocation")
-    LaunchedEffect(key1 = userLocation){
-        if(userLocation.lat != 0.0 && userLocation.lon != 0.0){
-            viewModel.getCurrentLocationWeather(userLocation.lat, userLocation.lon)
-        }
+    var shouldFecthedWeatherData by remember{
+        mutableStateOf(false)
     }
 
     Column(
@@ -83,20 +85,37 @@ fun WeatherScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        when(val state = currentLocation){
-            is NetworkResult.Loading -> {
-                WeatherLoading()
+        if(shouldFecthedWeatherData){
+            val userLocation = getUserLocation(context)
+            val currentLocation by viewModel.currentLocationWeather.collectAsState()
+
+            Log.i("LOCATION-TAG", "$userLocation")
+            LaunchedEffect(key1 = userLocation){
+                if(userLocation.lat != 0.0 && userLocation.lon != 0.0){
+                    viewModel.getCurrentLocationWeather(userLocation.lat, userLocation.lon)
+                }
             }
-            is NetworkResult.Success -> {
-                WeatherSuccess(
-                    data = state.data
-                )
+
+            when(val state = currentLocation){
+                is NetworkResult.Loading -> {
+                    WeatherLoading()
+                }
+                is NetworkResult.Success -> {
+                    WeatherSuccess(
+                        data = state.data
+                    )
+                }
+                is NetworkResult.Error -> {
+                    WeatherErrorException()
+                }
+                is NetworkResult.Exception -> {
+                    WeatherErrorException()
+                }
             }
-            is NetworkResult.Error -> {
-                WeatherErrorException()
-            }
-            is NetworkResult.Exception -> {
-                WeatherErrorException()
+        }else{
+            Button(onClick = { shouldFecthedWeatherData = true }) {
+                Icon(painter = painterResource(id = R.drawable.ic_sunny_weather), contentDescription = null, modifier = Modifier.padding(end = 10.dp))
+                Text(text = "Find my weather")
             }
         }
     }
@@ -125,14 +144,20 @@ private fun WeatherSuccess(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 5.dp),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.displaySmall.copy(
+            fontSize = 24.sp,
+            fontWeight = FontWeight.W600
+        )
     )
     Text(
         text = "${data.weather[0].main}, ${data.weather[0].description}",
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 5.dp),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.Normal,
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -209,8 +234,15 @@ fun getUserLocation(context : Context) : LatLon{
             if(!permissionsGranted){
                 Toast.makeText(context, "Permission is required", Toast.LENGTH_SHORT).show()
             }else{
-                // Get current location here and launch weather api request
-                locationUpdate()
+                locationProvider.lastLocation.addOnSuccessListener { location ->
+                    location?.let{
+                        val lat = it.latitude
+                        val lon = it.longitude
+                        currentUserLocation = LatLon(lat, lon)
+                    }
+                }.addOnFailureListener {
+                    Log.e("Location-ERROR", it.message.toString())
+                }
             }
         }
     )
@@ -301,9 +333,6 @@ private fun getWeatherAnimation(weather : String) : Int{
 @Composable
 private fun WeatherScreenPreview(){
     MyWeatherTheme {
-//        WeatherSuccess(
-//            modifier = Modifier
-//                .fillMaxSize()
-//        )
+
     }
 }

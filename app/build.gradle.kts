@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -85,4 +87,8 @@ dependencies {
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+
+    // Hilt Injection
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 }

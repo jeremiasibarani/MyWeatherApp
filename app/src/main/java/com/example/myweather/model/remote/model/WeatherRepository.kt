@@ -17,6 +17,7 @@ class WeatherRepository(
             queries["lon"] = lon
             queries["appid"] = BuildConfig.API_KEY
             queries["units"] = "metric"
+            queries["lang"] = "id"
 
             val response = apiService.getCurrentLocationWeather(queries)
             val responseBody = response.body()
