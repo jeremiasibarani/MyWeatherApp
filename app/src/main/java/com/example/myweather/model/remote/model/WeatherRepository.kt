@@ -4,11 +4,11 @@ import com.example.myweather.BuildConfig
 import com.example.myweather.model.remote.config.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class WeatherRepository(
+class WeatherRepository @Inject constructor(
     private val apiService : ApiService
 ) {
-
     fun getCurrentLocationWeather(lat : Double, lon : Double) : Flow<NetworkResult<CurrentLocationWeatherResponse>> = flow {
         emit(NetworkResult.Loading)
         try {

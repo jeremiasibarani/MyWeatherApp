@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,14 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -51,7 +49,6 @@ import com.example.myweather.R
 import com.example.myweather.model.remote.model.CurrentLocationWeatherResponse
 import com.example.myweather.model.remote.model.NetworkResult
 import com.example.myweather.ui.WeatherViewModel
-import com.example.myweather.ui.WeatherViewModelFactory
 import com.example.myweather.ui.theme.MyWeatherTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -71,7 +68,7 @@ data class LatLon(
 @Composable
 fun WeatherScreen(
     modifier : Modifier,
-    viewModel : WeatherViewModel = viewModel(factory = WeatherViewModelFactory.getInstance())
+    viewModel : WeatherViewModel = hiltViewModel()
 ){
     val context = LocalContext.current
 

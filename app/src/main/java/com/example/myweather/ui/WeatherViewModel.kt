@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.myweather.model.remote.model.CurrentLocationWeatherResponse
 import com.example.myweather.model.remote.model.NetworkResult
 import com.example.myweather.model.remote.model.WeatherRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
+@HiltViewModel
+class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) : ViewModel() {
 
     private val _currentLocationWeather = MutableStateFlow<NetworkResult<CurrentLocationWeatherResponse>>(NetworkResult.Loading)
     val currentLocationWeather : StateFlow<NetworkResult<CurrentLocationWeatherResponse>> = _currentLocationWeather
